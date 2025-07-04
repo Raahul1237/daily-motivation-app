@@ -27,4 +27,5 @@ This is a simple yet powerful Streamlit web app that delivers short, personalize
 git clone https://github.com/yourusername/daily-motivation-app.git
 cd daily-motivation-app
 
+
 Add README.md with project details
