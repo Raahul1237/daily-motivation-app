@@ -1,13 +1,19 @@
 import streamlit as st
-import requests
+import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Load Hugging Face token from .env
+# Load environment variables
 load_dotenv()
-HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Streamlit UI
+# Configure Gemini
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Initialize the Gemini Pro model
+model = genai.GenerativeModel("gemini-2.5-flash")
+
+# Streamlit UI setup
 st.set_page_config(page_title="Daily Motivation Generator", page_icon="💪", layout="centered")
 st.title("💡 Daily Motivation Generator")
 st.markdown("Feeling stuck or need a boost? Select your mood or situation and get an encouraging quote!")
@@ -19,29 +25,16 @@ moods = [
 ]
 selected_mood = st.selectbox("Choose your current situation or mood:", moods)
 
-# Use GPT-2 (public model) to generate motivational quotes
+# Generate motivation using Gemini
 def generate_motivation(mood):
-    prompt = f"Motivational quote for someone who is {mood.lower()}:"
-
+    prompt = f"Write a short and powerful motivational quote for someone who is {mood.lower()}."
     try:
-        response = requests.post(
-            "https://api-inference.huggingface.co/models/gpt2",
-            headers={"Authorization": f"Bearer {HF_TOKEN}"},
-            json={"inputs": prompt, "parameters": {"max_new_tokens": 40}}
-        )
-
-        if response.status_code == 200:
-            return response.json()[0]["generated_text"].replace(prompt, "").strip()
-        elif response.status_code == 401:
-            return "⚠️ Invalid Hugging Face token. Check your `.env` file."
-        elif response.status_code == 403:
-            return "⚠️ You don't have permission to use this model. Try another one."
-        else:
-            return f"⚠️ API Error: {response.status_code} - {response.text}"
+        response = model.generate_content(prompt)
+        return response.text.strip()
     except Exception as e:
         return f"⚠️ Error: {e}"
 
-# Display result on button click
+# Button and display
 if st.button("Generate Motivation ✨"):
     with st.spinner("Crafting your motivation..."):
         quote = generate_motivation(selected_mood)
