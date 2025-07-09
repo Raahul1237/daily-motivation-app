@@ -65,3 +65,6 @@ Online deployment (Streamlit Cloud / Hugging Face Spaces)
 
 This project is open source under the MIT License.
 
+## PROJECT LINK
+
+https://daily-motivation-app-czeqzjtixm3rrxagdk2ter.streamlit.app/
